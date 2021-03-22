@@ -34,21 +34,22 @@ class duo_phone:
 
 def getPhones():
 
-	user_list = ['lab', 'nora']
+	user_list = ['username1', 'username2']
 
 	phone_delete_list = []
 
 	for user in user_list:
 
-		u = admin_api.get_users_by_name(user)[0]
+		try:
+			u = admin_api.get_users_by_name(user)[0]
+			phones = u['phones']
+			for phone in phones:
+				if not phone['activated']:
+					p = duo_phone(u['username'], u['user_id'], u['email'], phone['activated'], phone['capabilities'], phone['last_seen'],phone['model'], phone['number'], phone['phone_id'], phone['platform'], phone['type'])
+					phone_delete_list.append(p)
 
-		phones = u['phones']
-
-		for phone in phones:
-			if not phone['activated']:
-
-				p = duo_phone(u['username'], u['user_id'], u['email'], phone['activated'], phone['capabilities'], phone['last_seen'],phone['model'], phone['number'], phone['phone_id'], phone['platform'], phone['type'])
-				phone_delete_list.append(p)
+		except Exception as e:
+			print('User "' + user + '" could not be found.')
 
 		return phone_delete_list
 
