@@ -10,9 +10,9 @@ def get_next_arg(prompt):
         return input(prompt)
 
 admin_api = duo_client.Admin(
-    ikey=get_next_arg('Admin API integration key ("DI..."): '),
+    ikey=get_next_arg('Admin API integration key: '),
     skey=get_next_arg('Admin API secret key: '),
-    host=get_next_arg('Admin API hostname ("api-....duosecurity.com"): '),
+    host=get_next_arg('Admin API hostname: '),
 )
 
 mode = get_next_arg('Type REMOVE to disassociate phones from users, otherwise type return to run in read only mode: ')
@@ -50,6 +50,7 @@ def getPhones():
 
 		except Exception as e:
 			print('User "' + user + '" could not be found.')
+			continue
 
 		return phone_delete_list
 
@@ -65,44 +66,45 @@ def writeCSV(phone_delete_list, file_name="phone_delete_list.csv"):
     columns = []
     rows = []
 
-    for phone in phone_delete_list:
-        
-        # build columns
-        for column in phone.__dict__.keys():
-            if column not in columns:
-                columns.append(column)
+    if phone_delete_list:
+	    for phone in phone_delete_list:
+	        
+	        # build columns
+	        for column in phone.__dict__.keys():
+	            if column not in columns:
+	                columns.append(column)
 
-        # build rows
-        row = ''
-        for column in columns:
-            if column in phone.__dict__.keys():
-                if phone.__dict__.get(column) is None:
-                    row += ','
-                else:
-                    row += str(phone.__dict__.get(column)) + ','
-            else:
-                row += ','
-        
-        row = row[:-1]
-        row += '\n'
-        rows.append(row)
-    
-    file = open(file_name, 'w')
-    
-    headers = ''
+	        # build rows
+	        row = ''
+	        for column in columns:
+	            if column in phone.__dict__.keys():
+	                if phone.__dict__.get(column) is None:
+	                    row += ','
+	                else:
+	                    row += str(phone.__dict__.get(column)) + ','
+	            else:
+	                row += ','
+	        
+	        row = row[:-1]
+	        row += '\n'
+	        rows.append(row)
+	    
+	    file = open(file_name, 'w')
+	    
+	    headers = ''
 
-    for column in columns:
-        headers += str(column) + ','
-    headers = headers[:-1]
+	    for column in columns:
+	        headers += str(column) + ','
+	    headers = headers[:-1]
 
-    file.write(headers + '\n')
+	    file.write(headers + '\n')
 
-    line = ''
+	    line = ''
 
-    for row in rows:
-        file.write(row)
+	    for row in rows:
+	        file.write(row)
 
-    file.close()
+	    file.close()
 
 def main():
 
