@@ -34,7 +34,7 @@ class duo_phone:
 
 def getPhones():
 
-	user_list = ['username1', 'username2']
+	user_list = ['username1', 'lab']
 
 	phone_delete_list = []
 
@@ -56,12 +56,13 @@ def getPhones():
 
 def deletePhones(phone_delete_list):
 	
-	for phone in phone_delete_list:
-		admin_api.delete_user_phone(phone.user_id, phone.phone_id)
+	if phone_delete_list:
+		for phone in phone_delete_list:
+			admin_api.delete_user_phone(phone.user_id, phone.phone_id)
+			print('Disassociate "' + phone.number + '" from ' + phone.username + '.')
 
 
 def writeCSV(phone_delete_list, file_name="phone_delete_list.csv"):
-
 
     columns = []
     rows = []
@@ -108,11 +109,14 @@ def writeCSV(phone_delete_list, file_name="phone_delete_list.csv"):
 
 def main():
 
-	phone_delete_list = getPhones()
-	writeCSV(phone_delete_list)
-
 	if mode == 'REMOVE':
+		phone_delete_list = getPhones()
+		writeCSV(phone_delete_list)
 		deletePhones(phone_delete_list)
+	else:
+		print("Read-only Mode")
+		phone_delete_list = getPhones()
+		writeCSV(phone_delete_list)
 
 
 if __name__ == "__main__":
