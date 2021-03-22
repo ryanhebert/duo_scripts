@@ -114,7 +114,7 @@ def main():
 		writeCSV(phone_delete_list)
 		deletePhones(phone_delete_list)
 	else:
-		print("Read-only Mode")
+		print("Report-only Mode")
 		phone_delete_list = getPhones()
 		writeCSV(phone_delete_list)
 
