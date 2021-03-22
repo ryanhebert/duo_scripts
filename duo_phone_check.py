@@ -34,7 +34,7 @@ class duo_phone:
 
 def getPhones():
 
-	user_list = ['username1', 'lab']
+	user_list = ['username1', 'username2', 'username3']
 
 	phone_delete_list = []
 
