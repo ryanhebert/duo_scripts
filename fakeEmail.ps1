@@ -1,4 +1,4 @@
- $group = "Hebert Pets"
+$group = "Hebert Pets"
 $emailDomain = "lab21.ryan.am"
 $property = "wWWHomePage"
 
