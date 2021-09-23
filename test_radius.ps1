@@ -1,5 +1,5 @@
- $radius_host = '127.0.0.1'
-$radius_secret = 'test'
+$radius_host = 'CHANGE_ME'
+$radius_secret = 'CHANGE_ME'
 
 $creds = Get-Credential
  
