@@ -1,7 +1,7 @@
 $radius_host = 'CHANGE_ME'
 $radius_secret = 'CHANGE_ME'
 
-$creds = Get-Credential
+$creds = Get-Credential  -Message 'Please authenticate with your Duo test user.'
  
 $Radius_installed = [appdomain]::CurrentDomain.GetAssemblies() | foreach {$_.Fullname.Split(",")[0]} | where{$_ -eq 'Radius'}
  
