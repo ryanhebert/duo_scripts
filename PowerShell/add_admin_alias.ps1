@@ -26,7 +26,7 @@ if($admin_group)
 }
     
 
-# Get a list of all admins that match the admin prfix #'sAMAccountName -like $filter'
+# Get a list of all admins that match the admin prefix
 $admins = Get-ADUser -Filter $filter
 
 
