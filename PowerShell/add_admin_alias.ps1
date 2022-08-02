@@ -1,4 +1,23 @@
- # User defined variables
+###################################################################
+# This code is a sample meant to be a template or starting point. #
+# It is not official and shouldn't be used in production without  #
+# being reviewed by a qualified engineer.                         #
+###################################################################
+
+$I_Agree = $false
+if($I_Agree)
+{
+    Write-Host "`n😊 😊 😊 😊 😊 😊`n" -ForegroundColor Yellow
+    Write-Host "So it begins..." -ForegroundColor Green -BackgroundColor Black
+    Write-Host "`n😊 😊 😊 😊 😊 😊`n" -ForegroundColor Yellow
+}
+else
+{
+    Write-Host "`nYou must review the code before running it.`n" -ForegroundColor White -BackgroundColor DarkRed
+    exit
+}
+ 
+# User defined variables
 $attribute = "msDS-cloudExtensionAttribute1"
 $admin_prefix = "adm_"
 
