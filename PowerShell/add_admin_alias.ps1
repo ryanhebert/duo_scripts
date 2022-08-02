@@ -16,6 +16,8 @@ else
     Write-Host "`nYou must review the code before running it.`n" -ForegroundColor White -BackgroundColor DarkRed
     exit
 }
+
+###################################################################
  
 # User defined variables
 $attribute = "msDS-cloudExtensionAttribute1"
