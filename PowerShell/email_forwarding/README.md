@@ -53,7 +53,7 @@ Get-MgUserMailFolderMessageRule -UserId "user@yourdomain.com" -MailFolderId "Inb
 ## Removing the Rule
 To remove the forwarding rule, run:
 ```powershell
-$RuleName = "Forward Welcome Emails"
+$RuleName = "Duo: Forward enrollment emails"
 $Rules = Get-MgUserMailFolderMessageRule -UserId "user@yourdomain.com" -MailFolderId "Inbox"
 $RuleToRemove = $Rules | Where-Object { $_.DisplayName -eq $RuleName }
 
