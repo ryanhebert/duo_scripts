@@ -168,7 +168,3 @@ These credentials will be stored in your OS keyring, associated with a service n
 
 Ensure you have an `alpha-2.json` file in the same directory as the script, or specify its path using the `--alpha2-file` argument. This file is crucial for country code validation and lookup.
 
-
-
-```bash
-# Example for Windows Command Prompt
