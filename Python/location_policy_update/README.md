@@ -3,25 +3,19 @@
 
 ## Table of Contents
 
-1. [Project Overview](#project-overview)
-2. [Features](#features)
-3. [Prerequisites](#prerequisites)
-4. [Installation](#installation)
-5. [Configuration](#configuration)
+1. [1. Project Overview](#1-project-overview)
+2. [2. Features](#2-features)
+3. [3. Prerequisites](#3-prerequisites)
+4. [4. Installation](#4-installation)
+5. [Capturing Required Configuration Values from Duo](#capturing-required-configuration-values-from-duo)
+   - [Admin API Integration Page (ikey, skey, API Hostname)](#admin-api-integration-page-ikey-skey-api-hostname)
+   - [Duo Policy Page (Policy Key – New Policy Editor)](#duo-policy-page-policy-key-new-policy-editor)
+6. [5. Configuration](#5-configuration)
+7. [First-Time Setup and Credential Handling](#first-time-setup-and-credential-handling)
+   - [Initial Credential and Policy Key Setup](#initial-credential-and-policy-key-setup)
+   - [Important Security Notice](#important-security-notice)
    - [Duo Admin API Credentials](#duo-admin-api-credentials)
-   - [alpha-2.json File](#alpha-2json-file)
-6. [Usage](#usage)
-   - [Running the Script](#running-the-script)
-   - [Main Menu Options](#main-menu-options)
-   - [Idle Timeout](#idle-timeout)
-   - [Debug Mode](#debug-mode)
-7. [Audit Logging](#audit-logging)
-8. [Backup Strategy](#backup-strategy)
-9. [Security Considerations](#security-considerations)
-10. [Troubleshooting](#troubleshooting)
-11. [Contributing](#contributing)
-12. [License](#license)
-
+   - [`alpha-2.json` File](#alpha-2json-file)
 
 ---
 
@@ -80,6 +74,37 @@ The script is designed for Windows environments, leveraging `fsutil` for unique 
 
 2.  **Install Dependencies:**
     
+
+
+## Capturing Required Configuration Values from Duo
+
+You will need **four values** from the Duo Admin Panel to configure this script.
+
+### Admin API Integration Page (ikey, skey, API Hostname)
+
+From the **Admin API integration** you created:
+
+Capture the following values (shown on the integration page):
+- **Integration Key (ikey)**
+- **Secret Key (skey)**
+- **API Hostname** (e.g., `api-xxxxxxxx.duosecurity.com`)
+
+### Duo Policy Page (Policy Key – New Policy Editor)
+
+The **Policy Key** is obtained from the Duo policy you want to manage.
+
+1. Navigate to **Policies** in the Duo Admin Panel.
+2. Open the policy you want to modify.
+3. Ensure you are using the **New Policy Editor**.
+4. Locate the **Policy Key** shown in the editor.
+
+Duo policy documentation:
+https://duo.com/docs/policy#new-policy-editor
+
+The policy key is required for all Admin API policy operations.
+
+
+---
 
 ## 5. Configuration
 
