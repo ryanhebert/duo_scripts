@@ -1,25 +1,27 @@
 # Duo Policy Location Update Script (Windows)
 
+
 ## Table of Contents
 
-1.  [Project Overview](#project-overview)
-2.  [Features](#features)
-3.  [Prerequisites](#prerequisites)
-4.  [Installation](#installation)
-5.  [Configuration](#configuration)
-    *   [Duo Admin API Credentials](#duo-admin-api-credentials)
-    *   [`alpha-2.json` File](#alpha-2json-file)
-    6.  [Usage](#usage)
-    *   [Running the Script](#running-the-script)
-    *   [Main Menu Options](#main-menu-options)
-    *   [Idle Timeout](#idle-timeout)
-    *   [Debug Mode](#debug-mode)
-7.  [Audit Logging](#audit-logging)
-8.  [Backup Strategy](#backup-strategy)
-9.  [Security Considerations](#security-considerations)
+1. [Project Overview](#project-overview)
+2. [Features](#features)
+3. [Prerequisites](#prerequisites)
+4. [Installation](#installation)
+5. [Configuration](#configuration)
+   - [Duo Admin API Credentials](#duo-admin-api-credentials)
+   - [alpha-2.json File](#alpha-2json-file)
+6. [Usage](#usage)
+   - [Running the Script](#running-the-script)
+   - [Main Menu Options](#main-menu-options)
+   - [Idle Timeout](#idle-timeout)
+   - [Debug Mode](#debug-mode)
+7. [Audit Logging](#audit-logging)
+8. [Backup Strategy](#backup-strategy)
+9. [Security Considerations](#security-considerations)
 10. [Troubleshooting](#troubleshooting)
 11. [Contributing](#contributing)
 12. [License](#license)
+
 
 ---
 
@@ -73,16 +75,11 @@ The script is designed for Windows environments, leveraging `fsutil` for unique 
 ## 4. Installation
 
 1.  **Clone or Download:** Get the script and the `alpha-2.json` file.
-    ```bash
-    git clone <repository-url>
-    cd <repository-directory>
-    ```
+    
     (If not using git, just download `location_update_windows.py` and `alpha-2.json` into the same directory.)
 
 2.  **Install Dependencies:**
-    ```bash
-    pip install duo_client keyring
-    ```
+    
 
 ## 5. Configuration
 
@@ -100,3 +97,8 @@ These credentials will be stored in your OS keyring, associated with a service n
 ### `alpha-2.json` File
 
 Ensure you have an `alpha-2.json` file in the same directory as the script, or specify its path using the `--alpha2-file` argument. This file is crucial for country code validation and lookup.
+
+
+
+```bash
+# Example for Windows Command Prompt
