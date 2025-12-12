@@ -83,6 +83,51 @@ The script is designed for Windows environments, leveraging `fsutil` for unique 
 
 ## 5. Configuration
 
+
+## First-Time Setup and Credential Handling
+
+### Initial Credential and Policy Key Setup
+
+On the **first run**, the script will prompt you interactively for all required Duo configuration values:
+
+- **API Hostname**
+- **Integration Key (ikey)**
+- **Secret Key (skey)**
+- **Policy Key**
+
+These values are entered once and are required to establish authenticated access to the Duo Admin API and to identify the policy that will be managed.
+
+After successful entry:
+
+- Credentials (**ikey, skey, API host**) are securely stored using the operating system’s native **keyring** service.
+- The **policy key** is also stored securely and associated with this script instance.
+
+On **subsequent runs**, you will **not be prompted again** for these values. The script automatically retrieves them from secure storage, allowing normal operation without re-entering sensitive information.
+
+If credentials or the policy key need to be changed, they must be explicitly cleared from the keyring or updated through the script’s credential reset flow.
+
+---
+
+### Important Security Notice
+
+⚠️ **Protect Access to This Script Once Configured**
+
+After initial configuration, this script has the ability to:
+- Authenticate to the Duo Admin API
+- Read and modify Duo policy configuration
+
+Anyone with access to the machine and permission to execute this script can perform policy changes **without re-authenticating**.
+
+**Strongly recommended controls:**
+- Restrict filesystem access to the script directory (NTFS permissions)
+- Limit execution to trusted administrative users only
+- Avoid storing or running the script on shared or multi-user systems
+- Protect the system with disk encryption and OS-level account controls
+
+Treat this script with the same level of protection as other administrative security tooling.
+
+---
+
 ### Duo Admin API Credentials
 
 The script uses `keyring` to securely store your Duo Admin API credentials. The first time you run the script, or if credentials are not found, it will prompt you to enter them interactively:
@@ -97,3 +142,8 @@ These credentials will be stored in your OS keyring, associated with a service n
 ### `alpha-2.json` File
 
 Ensure you have an `alpha-2.json` file in the same directory as the script, or specify its path using the `--alpha2-file` argument. This file is crucial for country code validation and lookup.
+
+
+
+```bash
+# Example for Windows Command Prompt
