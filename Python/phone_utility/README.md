@@ -261,7 +261,3 @@ black .
 This project is provided as-is. Test in a non-production tenant if available, and ensure you have appropriate change control and approvals before deleting devices.
 
 ---
-
-## License
-
-Choose a license appropriate for your organization (e.g., MIT, Apache-2.0, or internal use only).
