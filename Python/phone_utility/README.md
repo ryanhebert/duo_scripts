@@ -1,38 +1,42 @@
-# Cisco Duo Admin Maintenance Tool
+# Duo Admin API Maintenance Tool (Devices & Cleanup)
 
-A small, interactive Python utility for **Duo Admin API** maintenance tasks:
+An interactive Python utility for **Duo Admin API** administrators to:
 
-- **Expired Phones Report**: Identify *active* Duo Mobile devices that are running an **outdated Duo Mobile app version** (default target: `4.85.0`) within a configurable lookback window (default: `365` days).
-- **Device Cleanup Utility**: Identify phones that appear **inactive** (not seen in N days) or **stale** (never seen and created more than N days ago), export candidates, and (optionally) **delete** them from Duo.
+1. **Identify active devices running an outdated Duo Mobile version** (within a configurable *Last seen* lookback window).
+2. **Identify and delete devices that are inactive or never-used** (with export + backup safeguards).
 
-> ⚠️ **High impact:** The cleanup flow can permanently delete phones from your Duo tenant. Read the safeguards section before using it.
+> ⚠️ **High impact:** The cleanup workflow can **permanently delete device records** from Duo. Review the safeguards section before using in production.
 
 ---
 
 ## What this tool does
 
-### 1) Expired Phones Report (Outdated Duo Mobile)
+### 1) Outdated Duo Mobile Devices (Active Devices)
 
-The tool pulls all phones from Duo, then filters for:
+The tool retrieves **all devices** (paged) from Duo, then filters for:
 
-- **Outdated app version**: `phone.app_version < TARGET_APP_VERSION`
-- **Seen recently**: `phone.last_seen` is within the **lookback window** (default: 365 days)
+- **Duo Mobile version earlier than `TARGET_APP_VERSION`** (default: `4.85.0`)
+- **Device "Last seen" is within the lookback window** (default: `365` days)
 
-It then builds two reports:
+It produces two report views and CSV exports:
 
-- **Phone-centric report** (`outdated_phones.csv`)
-  - One row per phone with assigned usernames, device metadata, last seen date, days since seen, and app version.
-- **User-centric report** (`outdated_users.csv`)
-  - One row per user with identity fields plus one or more `P#_` columns describing each matching outdated phone.
+- **Report grouped by device** (one row per device)
+- **Report grouped by user account** (one row per user account; includes multiple devices per user via `D1_*`, `D2_*`, ... columns)
 
-### 2) Cleanup Utility (Inactive / Stale Phones)
+### 2) Device Cleanup (Inactive / Never-used Devices)
 
-The tool identifies deletion candidates:
+The cleanup workflow evaluates all devices and identifies candidates:
 
-- **Inactive phones**: `last_seen` exists and is older than the inactivity threshold (default: 365 days)
-- **Stale phones**: never seen (no `last_seen`) and `created` timestamp older than the stale threshold (default: 365 days)
+- **Inactive devices:** devices with a `last_seen` timestamp older than the inactivity threshold (default: `365` days)
+- **Never-used devices:** devices **without** `last_seen` and with a `created` timestamp older than the never-used threshold (default: `365` days)
 
-You can export candidates to CSV, create a JSON backup, and—only after a hard confirmation—delete phones.
+You can:
+
+- Export candidates to CSV
+- Create a JSON backup (recommended)
+- Delete devices (requires an explicit confirmation phrase)
+
+> Note: If your tenant’s device payload does **not** include a `created` field, the **never-used** classification cannot be computed. In that case, the cleanup workflow will still find **inactive** devices, but may find **zero** never-used devices.
 
 ---
 
@@ -40,30 +44,30 @@ You can export candidates to CSV, create a JSON backup, and—only after a hard 
 
 - Python **3.9+** (3.10+ recommended)
 - Network access to your Duo Admin API hostname
-- Duo Admin API integration with required permissions
+- Duo Admin API integration with appropriate permissions
 
 ### Python dependencies
 
-This script imports:
+This script uses:
 
 - `duo_client`
 - `pandas`
 - `packaging`
 
-Install with pip:
+Install:
 
 ```bash
 pip install duo_client pandas packaging
 ```
 
-Or use a virtual environment:
+Recommended: virtual environment
 
 ```bash
 python -m venv .venv
-# Windows
-.venv\Scripts\activate
 # macOS/Linux
 source .venv/bin/activate
+# Windows
+.venv\Scripts\activate
 
 pip install duo_client pandas packaging
 ```
@@ -73,91 +77,95 @@ pip install duo_client pandas packaging
 ## Duo Admin API setup (required)
 
 1. Log in to the **Duo Admin Panel**.
-2. Navigate to **Applications** → **Protect an Application**.
-3. Search for **Admin API** and choose **Protect**.
-4. Copy the generated:
+2. Go to **Applications** → **Protect an Application**.
+3. Search for **Admin API** and click **Protect**.
+4. Copy the generated values:
    - **Integration key** (`IKEY`)
    - **Secret key** (`SKEY`)
    - **API hostname** (`HOST`, e.g., `api-xxxxxxxx.duosecurity.com`)
-5. Set the application’s permissions as follows:
 
-### Required Admin API permissions
+### Required permissions
 
-To run *reports only*:
+Minimum required to run **reports**:
 
-- **Grant read resource** (`adminapi_read_resource`)
+- `adminapi_read_resource`
 
-To use the *cleanup deletion* option:
+Required to **delete devices**:
 
-- **Grant write resource** (`adminapi_write_resource`)  
-  (covers create/modify/delete for resources like phones)
+- `adminapi_write_resource`
 
-These permission names/flags are documented in Duo’s Admin API docs.  
-See: Duo Admin API documentation: https://duo.com/docs/adminapi
-
-> Principle of least privilege: If you do not plan to delete phones, do **not** enable write permissions.
-
----
-
-## How authentication works
-
-You provide credentials via command-line arguments:
-
-- `--ikey` (integration key)
-- `--skey` (secret key)
-- `--host` (API hostname)
-
-Example:
-
-```bash
-python script.py --ikey DIXXXXXXXXXXXXXXXXXX --skey deadbeefdeadbeefdeadbeefdeadbeefdeadbeef --host api-xxxxxxx.duosecurity.com
-```
-
-> ⚠️ **Security note:** CLI arguments may be visible in shell history and process listings (depending on OS). Use a secure machine, avoid shared terminals, and consider running from a trusted admin jump box.
+> Follow least privilege: if you do not plan to delete devices, do **not** grant write permissions.
 
 ---
 
 ## Usage
 
-Run the script with required parameters:
+Run with required parameters:
 
 ```bash
-python script.py -ikey <IKEY> -skey <SKEY> -host <API_HOSTNAME>
+python script.py --ikey <IKEY> --skey <SKEY> --host <API_HOSTNAME>
 ```
 
-You’ll see the main menu:
+Optional: specify an output directory for exports/backups:
 
-- **1. Expired Phones Report**
-- **2. Device Cleanup Utility**
-- **3. Exit**
+```bash
+python script.py --ikey <IKEY> --skey <SKEY> --host <API_HOSTNAME> --outdir ./exports
+```
 
-### Expired Phones Report menu
-
-- **View Phone-Centric Report**
-- **View User-Centric Report**
-- **Change Lookback Period**
-- **Export Both Reports to CSV**
-
-Export files are created in your current working directory:
-
-- `outdated_phones.csv`
-- `outdated_users.csv`
-
-### Cleanup Utility menu
-
-- Change inactivity/stale thresholds
-- Export candidate list (`cleanup_candidates.csv`)
-- Delete phones (with guardrails)
+> ⚠️ Security note: CLI arguments can be visible in shell history/process listings depending on OS. Use a secure admin workstation/jump host.
 
 ---
 
-## Outputs and file formats
+## Text UI navigation
 
-### `outdated_phones.csv`
+### Main Menu
 
-Columns:
+- **1. Identify Active Devices Running Outdated Duo Mobile**
+- **2. Identify and Delete Inactive or Never-Used Devices**
+- **3. Exit**
 
-- `phone_id`
+### Outdated Duo Mobile Devices
+
+The tool shows inclusion criteria:
+
+- Duo Mobile version earlier than **TARGET_APP_VERSION**
+- Device last seen within the past **lookback** days
+
+Actions:
+
+1. View report grouped by device  
+2. View report grouped by user account  
+3. Modify device activity lookback period  
+4. Export reports to CSV  
+5. Back to main menu  
+
+### Device Cleanup (Inactive / Never-used)
+
+The tool shows criteria and the current candidate count.
+
+Actions:
+
+1. Change inactivity threshold  
+2. Change never-used device threshold  
+3. Export device cleanup candidate list (CSV)  
+4. **DELETE ALL IDENTIFIED DEVICES (PERMANENT)**  
+5. Refresh device inventory from Duo  
+6. Back to main menu  
+
+---
+
+## Outputs
+
+All outputs are written to `--outdir` (default: current directory).
+
+### Outdated device reports
+
+- `outdated_devices_by_device_lookback<days>_<timestamp>.csv`
+- `outdated_devices_by_user_lookback<days>_<timestamp>.csv`
+
+**Grouped-by-device columns** include:
+
+- `phone_id` (Duo device identifier)
 - `assigned_users`
 - `number`
 - `platform`
@@ -165,99 +173,80 @@ Columns:
 - `model`
 - `last_seen` (YYYY-MM-DD)
 - `days_since_seen`
-- `app_version`
+- `app_version` (Duo Mobile version)
 
-### `outdated_users.csv`
-
-Columns include:
+**Grouped-by-user columns** include:
 
 - `username`, `realname`, `email`
-- For each matching outdated phone: `P1_num`, `P1_id`, `P1_os`, `P1_seen`, `P1_days`, `P1_ver`  
-  And so on: `P2_*`, `P3_*`, ...
+- Per device: `D1_number`, `D1_device_id`, `D1_os_version`, `D1_last_seen`, `D1_days_since_seen`, `D1_duo_mobile_version`  
+  Then `D2_*`, `D3_*`, ...
 
-### `cleanup_candidates.csv`
+### Cleanup candidate list
 
-A raw export of candidate phone objects returned by Duo (all fields the API returned for each phone).
+- `device_cleanup_candidates_inactive<days>_neverused<days>_<timestamp>.csv`
 
-### JSON backup (optional during deletion)
+### JSON backups
 
-If you choose to create a backup before deleting, a file like:
+If you choose to create a backup prior to deletion:
 
-- `backup_YYYYMMDD_HHMMSS.json`
+- `device_cleanup_backup_<timestamp>.json`
 
-is written to the working directory.
+### Deletion failure log
+
+If any deletions fail, details are saved to:
+
+- `delete_failures_<timestamp>.json`
 
 ---
 
 ## Safeguards (read before deleting)
 
-The deletion flow includes multiple safety checks:
+The deletion flow includes multiple protections:
 
-1. **Candidate preview** (you can export before deleting)
-2. **Optional JSON backup prompt**
-3. A hard confirmation requiring you to type the exact phrase:
+1. Clear banner warning about permanent device deletion
+2. Optional CSV export prompt
+3. Optional JSON backup prompt
+4. Hard confirmation requiring typing an exact phrase:
 
 ```
-DELETE <N> PHONES
+DELETE <N> DEVICES
 ```
 
-Where `<N>` is the number of candidate phones.
+Where `<N>` is the number of devices currently identified for cleanup.
 
-> **Deletion is permanent** in Duo. Make a backup, export the CSV, and validate candidates before continuing.
+> Deletion is permanent. Export and back up before proceeding.
 
 ---
 
-## Configuration notes
+## Configuration
 
-The script contains two global defaults:
+Default values are defined near the top of the script:
 
 - `TARGET_APP_VERSION = "4.85.0"`
 - `DEFAULT_LOOKBACK = 365`
 
-You can change these in the script if your organization uses a different minimum Duo Mobile version.
+You can adjust these to match your organization’s minimum supported Duo Mobile version and reporting window.
 
 ---
 
 ## Troubleshooting
 
 ### “401 Unauthorized” / “403 Forbidden”
-- Verify `IKEY`, `SKEY`, and `HOST` are correct
-- Confirm the Admin API application permissions include:
+- Verify `IKEY`, `SKEY`, and `HOST`
+- Confirm permissions:
   - `adminapi_read_resource` (reports)
   - `adminapi_write_resource` (deletion)
 
-### Empty report results
+### “Never-used devices” always shows zero
+- Your device payload may not include a `created` timestamp
+- The tool still correctly identifies **inactive** devices based on `last_seen`
+
+### Empty outdated report results
 - Devices may not have been seen within your lookback window
-- Devices may have `app_version` missing or `N/A` (the script treats these as not-outdated)
+- Devices may not report `app_version` (treated as not-outdated)
 
-### API errors or timeouts
-- Check network connectivity to your Duo API hostname
-- Confirm system time is accurate (signature validation can fail if clock skew exists)
-
----
-
-## Development
-
-### Suggested `requirements.txt`
-
-```txt
-duo_client
-pandas
-packaging
-```
-
-### Linting / formatting (optional)
-
-```bash
-python -m pip install ruff black
-ruff check .
-black .
-```
-
----
-
-## Disclaimer
-
-This project is provided as-is. Test in a non-production tenant if available, and ensure you have appropriate change control and approvals before deleting devices.
+### API errors/timeouts
+- Check network access to the Duo API hostname
+- Ensure system clock is correct (API signing can fail with clock skew)
 
 ---
